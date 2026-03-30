@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "reconstruct": {
+      "type": "http",
+      "url": "https://reconstructmcp-production.up.railway.app",
+      "headers": {
+        "Authorization": "Bearer mcp_REPLACE_WITH_KEY_FROM_DASHBOARD"
+      }
+    }
+  }
+}

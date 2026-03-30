@@ -1,0 +1,10 @@
+{
+  "name": "reconstruct",
+  "description": "Reconstruct: MCP server and agent skills (GitHub Copilot CLI manifest path). VS Code uses root plugin.json — see https://code.visualstudio.com/docs/copilot/customization/agent-plugins",
+  "version": "1.0.0",
+  "author": {
+    "name": "BlkInnovate"
+  },
+  "skills": "skills/",
+  "mcpServers": ".mcp.json"
+}

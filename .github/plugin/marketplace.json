@@ -1,0 +1,16 @@
+{
+  "name": "reconstruct-plugins",
+  "owner": {
+    "name": "BlkInnovate"
+  },
+  "metadata": {
+    "description": "Reconstruct: GitHub Copilot CLI + VS Code Agent plugins (MCP, skills)."
+  },
+  "plugins": [
+    {
+      "name": "reconstruct",
+      "description": "MCP server wiring and agent skills for Copilot CLI and VS Code Agent Chat.",
+      "source": "./plugins/reconstruct"
+    }
+  ]
+}
