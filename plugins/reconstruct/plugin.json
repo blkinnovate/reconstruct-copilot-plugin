@@ -1,7 +1,7 @@
 {
   "name": "reconstruct",
   "description": "Reconstruct: MCP server and agent skills for GitHub Copilot (VS Code Agent plugins and Copilot CLI). See https://code.visualstudio.com/docs/copilot/customization/agent-plugins",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "BlkInnovate"
   },

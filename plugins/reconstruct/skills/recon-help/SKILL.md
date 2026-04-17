@@ -4,7 +4,7 @@ description: "Tutorial and quick reference for Reconstruct workflow"
 user-invocable: true
 disable-model-invocation: false
 context: main
-version: v0.4
+version: v0.5
 ---
 
 # Reconstruct Help
@@ -23,23 +23,53 @@ Get help with Reconstruct workflow.
 
 ## Quick Reference
 
-### Commands
+In this Copilot plugin, workflows are exposed as **skills** (e.g. **recon-manager**, **recon-worker**, **recon-ask-constructor**). Slash-command names below describe the same flows as in Cursor/Claude template commands.
 
-| Command | Purpose |
-|---------|---------|
-| `/recon-setup` | Connect workspace to project (one-time) |
-| `/recon-manager` | Manager agent: plan work, create capsules |
-| `/recon-worker` | Worker agent: execute plans |
-| `/recon-help` | This help |
+### Commands / skills
+
+| Command / skill | Purpose |
+|-----------------|---------|
+| `/recon-setup` / **recon-setup** | Connect workspace to project (one-time) |
+| `/recon-seed` / **recon-seed** | Onboarding: seed Context Cloud with project knowledge |
+| `/recon-manager` / **recon-manager** | Manager agent: plan work, create capsules |
+| `/recon-worker` / **recon-worker** | Worker agent: execute plans |
+| `/recon-ask-constructor` / **recon-ask-constructor** | Generate capsule + plan via MCP `ask_constructor`, then create/store/link and execute |
+| `/recon-help` / **recon-help** | This help |
 
 ### Typical Workflow
 
 ```
 1. /recon-setup      → Connect project (once)
-2. /recon-manager    → Describe work, create capsule + plan
-3. Open new chat
-4. /recon-worker     → Execute the plan
-5. Return to manager chat, say "done"
+2. /recon-seed       → (Optional) Seed Context Cloud with project knowledge
+3. /recon-manager    → Describe work, create capsule + plan
+4. Open new chat
+5. /recon-worker     → Execute the plan
+6. Return to manager chat, say "done"
+```
+
+### Ways to Use Reconstruct
+
+**0) Web app Constructor (interactive planning UI)**
+
+- Flow (typical): open Constructor in the Reconstruct web app → enter mission → review capsule + plan → approve/create → then execute in VS Code / Copilot via the worker flow
+- **recon-ask-constructor** calls the MCP tool `ask_constructor` to generate a similar “task package” (capsule context + plan) inside the editor
+
+**A) Standard: Manager → Worker**
+
+```
+/recon-manager  → creates capsule + stores plan + links session
+new chat
+/recon-worker   → executes the stored plan with approvals
+```
+
+**B) Single-chat: recon-ask-constructor skill**
+
+- Use when: you want “generate plan + execute” in one session for a focused task; confirm scope before edits (same as worker rules)
+
+**C) Onboarding: recon-seed**
+
+```
+/recon-seed
 ```
 
 ---
@@ -79,12 +109,13 @@ Reconstruct helps you work with AI agents on coding projects with guardrails and
 
 ```
 Step 1: Run /recon-setup to connect your project
-Step 2: Run /recon-manager and describe some work
-Step 3: The manager will create a capsule and plan
-Step 4: Open a new chat window
-Step 5: Run /recon-worker to execute
-Step 6: Approve each change as it's made
-Step 7: Return to manager when done
+Step 2: (Optional) Run /recon-seed to seed project context
+Step 3: Run /recon-manager and describe some work
+Step 4: The manager will create a capsule and plan
+Step 5: Open a new chat window
+Step 6: Run /recon-worker to execute
+Step 7: Approve each change as it's made
+Step 8: Return to manager when done
 ```
 
 **Ready?** Run `/recon-setup` to begin!
@@ -96,6 +127,11 @@ Step 7: Return to manager when done
 **If user said `/recon-help [topic]`:**
 
 ### Topics
+
+**seed** - Onboarding flow for Context Cloud:
+- Run `/recon-seed` to populate project context via Q&A rounds and repo scan
+- Works for first-time seed or re-seed (update existing)
+- User approval required before any write to cloud
 
 **capsules** - Capsules define work scope:
 - `allowed_path_patterns` - Where agent CAN work
@@ -119,7 +155,7 @@ Step 7: Return to manager when done
 - Content rules (patterns to follow)
 
 **errors** - Common issues:
-- "MCP not configured" → Check API key in Cursor settings
+- "MCP not configured" → Check API key / MCP configuration in VS Code (plugin `.mcp.json`)
 - "No session" → Run `/recon-manager` first
 - "2 session limit" → Archive an old session
 - See `/recon-help recovery` for more

@@ -4,15 +4,14 @@ This repository hosts the **`reconstruct`** [Agent plugin](https://code.visualst
 
 ## Users — VS Code (recommended)
 
-From [reconstruct-cli](https://github.com/blkinnovate/reconstruct/tree/main/reconstruct-cli), after **`reconstruct auth login`**:
+**`reconstruct install` does not register GitHub Copilot yet** (the CLI currently wires **Cursor** and **Claude Code** only). Use one of the following:
 
-```bash
-reconstruct install --assistant copilot
-```
+1. Add **`blkinnovate/reconstruct-copilot-plugin`** to VS Code **`chat.plugins.marketplaces`**, install the **reconstruct** plugin from the marketplace, then add **`.mcp.json`** at the plugin root (start from **`.mcp.json.example`**) with your Reconstruct **`mcp_…`** key.
+2. Or run **Chat: Install Plugin From Source** and select the **`plugins/reconstruct/`** folder from this repo — then add **`.mcp.json`** as above.
 
-That copies the bundled plugin to **`~/.reconstruct/vscode-copilot-plugin`**, writes **`.mcp.json`**, and registers the folder in VS Code **`chat.pluginLocations`**. Reload VS Code.
+After install, reload VS Code. Mint an MCP API key from the Reconstruct app (**Settings → MCP keys**) if you do not already have one.
 
-Alternatively: add **`blkinnovate/reconstruct-copilot-plugin`** to **`chat.plugins.marketplaces`**, or **Chat: Install Plugin From Source** with this repo — then add **`.mcp.json`** from **`.mcp.json.example`** with your **`mcp_…`** key.
+See also: [docs/cli-auth-install.md](https://github.com/blkinnovate/reconstruct/blob/main/docs/cli-auth-install.md) for **`reconstruct auth login`** and MCP overview (Copilot-specific automation may be added in a future CLI release).
 
 ## Users — Copilot CLI (optional)
 
