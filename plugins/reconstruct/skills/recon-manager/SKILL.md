@@ -42,7 +42,7 @@ Without a session and uploaded plan, the worker cannot function.
 
 ```
 1. Read .reconstruct/preferences.json → project_id
-   - Missing? → "Run /recon-setup first"
+   - If you cannot find or read it, run `grep` once (or search the repo) for `preferences.json` / `project_id` to confirm the file is not present elsewhere; if still absent → "Run /recon-setup first"
 
 2. Call get_notifications with project_id BEFORE anything else
    - If pending notifications exist:

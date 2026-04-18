@@ -24,7 +24,7 @@ Optional: include extra context cues in the mission text, like file paths (`/app
 ## Flow
 
 1. Read `.reconstruct/preferences.json` → `project_id`
-   - Missing? → "❌ Run /recon-setup first"
+   - If you cannot find or read it, run `grep` once (or search the repo) for `preferences.json` / `project_id` to confirm the file is not present elsewhere; if still absent → "❌ Run /recon-setup first"
 
 2. Call `ask_constructor`:
 
