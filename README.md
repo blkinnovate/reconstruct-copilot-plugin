@@ -4,10 +4,17 @@ This repository hosts the **`reconstruct`** [Agent plugin](https://code.visualst
 
 ## Users — VS Code (recommended)
 
-**`reconstruct install` does not register GitHub Copilot yet** (the CLI currently wires **Cursor** and **Claude Code** only). Use one of the following:
+Use **this** repository for VS Code Agent plugins — not [reconstruct-claude-plugin](https://github.com/blkinnovate/reconstruct-claude-plugin) (that layout is for Claude Code’s marketplace only).
 
-1. Add **`blkinnovate/reconstruct-copilot-plugin`** to VS Code **`chat.plugins.marketplaces`**, install the **reconstruct** plugin from the marketplace, then add **`.mcp.json`** at the plugin root (start from **`.mcp.json.example`**) with your Reconstruct **`mcp_…`** key.
-2. Or run **Chat: Install Plugin From Source** and select the **`plugins/reconstruct/`** folder from this repo — then add **`.mcp.json`** as above.
+**Prerequisites:** Agent plugins are [in preview](https://code.visualstudio.com/docs/copilot/customization/agent-plugins); ensure **`chat.plugins.enabled`** is on (your org may manage this).
+
+1. **`reconstruct install --assistant copilot`** (after [`reconstruct auth login`](https://github.com/blkinnovate/reconstruct/blob/main/docs/cli-auth-install.md)) — copies the bundled plugin to `~/.reconstruct/vscode-copilot-plugin`, writes **`.mcp.json`**, and registers **`chat.pluginLocations`**. Reload VS Code.
+
+2. **Marketplace:** Add **`blkinnovate/reconstruct-copilot-plugin`** to VS Code **`chat.plugins.marketplaces`**, open **Extensions** → search **`@agentPlugins`**, install **reconstruct**, then add **`.mcp.json`** at the **plugin root** for that install (copy from **[`plugins/reconstruct/.mcp.json.example`](./plugins/reconstruct/.mcp.json.example)**) with your Reconstruct **`mcp_…`** key.
+
+3. **Install from Git:** Run **Chat: Install Plugin From Source** and enter the repo URL, e.g. **`https://github.com/blkinnovate/reconstruct-copilot-plugin.git`**. VS Code clones the repository and loads the root **`plugin.json`**, which points at **`plugins/reconstruct/`** for skills and MCP. Copy **`plugins/reconstruct/.mcp.json.example`** to **`plugins/reconstruct/.mcp.json`** and add your key.
+
+4. **Local checkout:** Register the folder in **`chat.pluginLocations`**. You can use the repo root (uses root **`plugin.json`**) or only **`plugins/reconstruct/`** (uses the nested **`plugin.json`**). Add **`.mcp.json`** next to the **`plugin.json`** you are using (`plugins/reconstruct/.mcp.json` in both cases).
 
 After install, reload VS Code. Mint an MCP API key from the Reconstruct app (**Settings → MCP keys**) if you do not already have one.
 
@@ -26,10 +33,13 @@ Docs: [Finding and installing plugins for GitHub Copilot CLI](https://docs.githu
 
 The canonical bundled copy used by **`reconstruct-cli`** lives in the monorepo at **`reconstruct-cli/bundled/reconstruct-copilot-plugin/`**. Before tagging a release here, sync that tree into **`plugins/reconstruct/`** (replace contents) so the marketplace and the CLI bundle stay aligned.
 
+**VS Code “Install from Git”** resolves **`plugin.json`** at the [repository root](https://code.visualstudio.com/docs/copilot/customization/agent-plugins#_cross-tool-compatibility) first. This repo keeps **root `plugin.json`** (paths into **`plugins/reconstruct/`**) so a full clone works; do not delete it when syncing the nested folder.
+
 ```bash
 # From the reconstruct monorepo root
 rm -rf reconstruct-copilot-plugin/plugins/reconstruct
 cp -R reconstruct-cli/bundled/reconstruct-copilot-plugin reconstruct-copilot-plugin/plugins/reconstruct
+# Keep version/description in root plugin.json aligned with plugins/reconstruct/plugin.json when you bump releases
 ```
 
 Then commit, tag, and push this repository.
