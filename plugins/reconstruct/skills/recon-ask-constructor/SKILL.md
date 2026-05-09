@@ -47,8 +47,8 @@ Optional: include extra context cues in the mission text, like file paths (`/app
      - `forbidden_path_patterns`: exclude secrets/config and build outputs (e.g. `/.env*`, `/.reconstruct/**`, `/node_modules/**`, `/.next/**`, `/dist/**`)
      - `guardrails`: at minimum, “stay in mission scope” + “avoid unrelated refactors”
    - Store the implementation plan via `store_task_plan` (with `project_id`, plan content, `session_id`, and metadata as required) and capture the returned plan id.
-   - Link the plan to the active session via `update_session` so both `manager_context.active_plan_id` and `session_context.active_task_plan_id` reference the stored plan.
-   - Link the capsule to the session via `submit_capsule_plan(session_id, capsule_id, planned_paths)` using the MCP fields your tool schema defines.
+   - Activate the session atomically via `activate_session_work(session_id, capsule_id, task_plan_id, planned_paths)`.
+   - Do not use `update_session` or `submit_capsule_plan` for new handoffs; they do not fully establish the worker’s canonical active state.
 
 5. Execute the plan immediately (worker-style, in this same chat):
    - Load the stored plan via `get_task_plan(session_id)`
@@ -60,7 +60,7 @@ Optional: include extra context cues in the mission text, like file paths (`/app
      - Validate with `read_lints` after substantive edits
    - Report progress after each step via `report_capsule_progress(session_id, capsule_id, progress)` with `status: "in_progress"` while work continues.
    - On completion, call `report_capsule_progress` with:
-     - `status: "completed"`
+     - `status: "done"`
      - `summary`, `files_modified`
      - `learnings` (required)
 
