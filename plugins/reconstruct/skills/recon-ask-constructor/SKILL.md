@@ -4,14 +4,14 @@ description: "Generate a capsule + implementation plan via ask_constructor"
 user-invocable: true
 disable-model-invocation: false
 context: main
-version: v0.1
+version: v0.2
 ---
 
 # recon-ask-constructor
 
-**GitHub Copilot (VS Code Agent plugins):** This repository ships workflows as **skills** under `skills/` (see [Agent plugins](https://code.visualstudio.com/docs/copilot/customization/agent-plugins)). There is no Cursor-style `/recon-ask-constructor` slash command file here; use this **skill** when the user wants the Constructor single-chat flow.
+**Claude Code:** Use this skill when the user wants the Constructor single-chat flow: one session for planning and execution without a separate manager handoff.
 
-Use `ask_constructor` to generate a coding-ready task package (virtual capsule context + implementation plan) in one call, convert it into a real capsule + stored plan, then execute the plan in this same chat (no separate manager handoff required).
+Use `ask_constructor` to generate a coding-ready task package (virtual capsule context + implementation plan) in one call, convert it into a real capsule + stored plan, then execute the plan in this same chat.
 
 ## Usage
 
@@ -24,7 +24,7 @@ Optional: include extra context cues in the mission text, like file paths (`/app
 ## Flow
 
 1. Read `.reconstruct/preferences.json` → `project_id`
-   - If you cannot find or read it, run `grep` once (or search the repo) for `preferences.json` / `project_id` to confirm the file is not present elsewhere; if still absent → "❌ Run /recon-setup first"
+   - Missing? → "❌ Complete recon-setup first (recon-setup skill / project setup)"
 
 2. Call `ask_constructor`:
 

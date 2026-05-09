@@ -1,10 +1,10 @@
 ---
 name: recon-manager
-description: "Manager agent: check notifications, create capsules, plan work, coordinate implementation"
+description: "Manager agent: create capsules, plan work, coordinate implementation"
 user-invocable: true
 disable-model-invocation: false
 context: main
-version: v0.4
+version: v0.6
 ---
 
 # Reconstruct Manager Agent
@@ -38,37 +38,26 @@ Without a session and uploaded plan, the worker cannot function.
 
 ---
 
-## 1. Prerequisites + Notification Check + Session Setup
+## 1. Prerequisites + Session Setup
 
 ```
 1. Read .reconstruct/preferences.json → project_id
-   - If you cannot find or read it, run `grep` once (or search the repo) for `preferences.json` / `project_id` to confirm the file is not present elsewhere; if still absent → "Run /recon-setup first"
+   - Missing? → "Run /recon-setup first"
 
-2. Call get_notifications with project_id BEFORE anything else
-   - If pending notifications exist:
-     - Show them first
-     - Ask whether to handle them now before planning new work
-   - If none exist:
-     - State that there are no pending project notifications
-
-3. Call get_session with project_id
+2. Call get_session with project_id
    - MCP fails? → "❌ MCP not connected. Run /recon-setup"
 ```
-
-**Notification handling rule:**
-- This is **Step 0** for every manager run.
-- Check notifications at the start of every `/recon-manager` session before capsule planning.
-- Surface pending clarification questions and notifications succinctly.
-- If the user wants to answer them, do that first.
-- `recon-worker` does **not** do this; manager owns the inbox check.
 
 **Handle sessions:**
 
 | Sessions Found | Action |
 |----------------|--------|
 | None | **CREATE SESSION NOW** (see below) |
-| 1 active | Ask: "Resume [session name]?" or create new |
+| 1 active | Ask: **"Resume [session name]?"** or **"Work on something new?"** |
 | 2 active | Must archive one first |
+
+**If user chooses to resume:** keep the session, keep current active capsule and plan unless they are replaced this session.
+**If user chooses something new:** archive the old session first (call `archive_session`), then create a fresh session.
 
 **If no session exists, create one immediately:**
 ```
@@ -134,13 +123,22 @@ Call create_project_capsule:
 
 **Extract `capsule_id`**
 
-**Check for conflicts:**
+**Always check for conflicts before proceeding:**
 ```
 Call check_conflicts:
-- session_id (if resuming)
-- file_paths: [from allowed_path_patterns]
+- session_id
+- file_paths: [concrete file paths only — not glob patterns]
 ```
-If conflicts → warn user, suggest alternatives
+
+Show the result to the user. Enforcement depends on conflict type:
+
+| Conflict type | Action |
+|--------------|--------|
+| `modified` (file actively being changed by another session) | **STOP. Show to user. Ask them to confirm or abort.** |
+| `planned` (another session claimed the path but hasn't started) | Warn user. Ask them to confirm before continuing. |
+| No conflicts | Continue. |
+
+**Do not proceed past this step until the user has acknowledged conflicts.**
 
 ---
 
@@ -227,28 +225,28 @@ Waiting for your approval...
    
    → Extract plan_id
 
-3. Link plan to session:
-   Call update_session:
-   - session_id
-   - manager_context: { "active_plan_id": "[plan_id]" }
-
-4. Link capsule to session:
-   Call submit_capsule_plan:
+3. Activate the session work in one step:
+   Call activate_session_work:
    - session_id
    - capsule_id
-   - planned_paths: [from allowed_path_patterns]
+   - task_plan_id: [plan_id from step 2]
+   - planned_paths: [concrete file paths only — no glob patterns like /components/**]
+   
+   This atomically sets the session's active capsule, plan, and mode.
+   Do NOT call update_session or submit_capsule_plan separately.
 ```
 
-**Confirm upload was successful:**
+**Confirm activation was successful:**
 ```
-✅ Plan uploaded to MCP!
+✅ Plan uploaded and session activated!
 
 Session: [session_id]
 Plan: [plan_id]
 Capsule: [capsule_id]
+Mode: worker
 ```
 
-**If any MCP call fails → retry or report error. Do not proceed to handoff without successful upload.**
+**If any MCP call fails → retry or report error. Do not proceed to handoff without successful activation.**
 
 ---
 

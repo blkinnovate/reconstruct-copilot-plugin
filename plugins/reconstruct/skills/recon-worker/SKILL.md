@@ -4,7 +4,7 @@ description: "Worker agent: execute capsule plan with human approval"
 user-invocable: true
 disable-model-invocation: false
 context: main
-version: v0.4
+version: v0.5
 ---
 
 # Reconstruct Worker Agent
@@ -15,20 +15,22 @@ Execute capsule plan. Human approves changes. Validate before proceeding.
 
 ```
 1. Read .reconstruct/preferences.json → project_id
-   - If you cannot find or read it, run `grep` once (or search the repo) for `preferences.json` / `project_id` to confirm the file is not present elsewhere; if still absent → "❌ Run /recon-setup first"
+   - Missing? → "❌ Run /recon-setup first"
 
 2. Call get_session with project_id
    - No sessions? → "❌ Run /recon-manager first"
    - Multiple? → Ask which to use
    → Extract session_id
 
-3. Get plan_id from session's manager_context.active_plan_id
-   - No plan? → "❌ Return to manager session"
+3. Call get_session_work with session_id
+   → Extract: active_capsule_id, active_plan_id, mode
+   - No active plan? → "❌ Return to manager session and run /recon-manager"
+   - Do NOT infer plan from other session fields — use exact IDs only
 
-4. Call get_task_plan with session_id
+4. Call get_task_plan with task_plan_id=active_plan_id + project_id
    → Extract plan content, execution_type
 
-5. Call get_capsule_context with session_id + capsule_id
+5. Call get_capsule_context with session_id + capsule_id=active_capsule_id
    → Extract: allowed_paths, forbidden_paths, guardrails
 ```
 
@@ -186,8 +188,9 @@ Session: [session_id]
 | Tool | When |
 |------|------|
 | `get_session` | Start - find session |
-| `get_task_plan` | Start - load plan |
-| `get_capsule_context` | Start - load guardrails |
+| `get_session_work` | Start - load active capsule + plan IDs (no fallback) |
+| `get_task_plan` | Start - load plan content by exact plan ID |
+| `get_capsule_context` | Start - load guardrails by exact capsule ID |
 | `checkAction` | Before file changes (optional) |
 | `report_capsule_progress` | After steps + at end |
 | `read_lints` | After each change |
